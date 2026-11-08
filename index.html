@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#080806">
+    <meta name="description" content="Strona Dominiki">
+    <title>Dominika</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Cormorant+Garamond:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        color-scheme: dark;
+        --gold: #d7b76b;
+        --gold-light: #f3dfa1;
+        --shift-x: 0px;
+        --shift-y: 0px;
+        font-family: "Cormorant Garamond", Georgia, serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        min-width: 280px;
+        min-height: 100%;
+        margin: 0;
+      }
+
+      body {
+        min-height: 100svh;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(ellipse at 50% 47%, rgba(114, 83, 28, 0.13), transparent 38%),
+          radial-gradient(ellipse at center, #10100c 0%, #090907 49%, #050504 100%);
+        color: var(--gold-light);
+        isolation: isolate;
+      }
+
+      body::before {
+        position: fixed;
+        z-index: 5;
+        inset: 0;
+        content: "";
+        opacity: 0;
+        pointer-events: none;
+        background: radial-gradient(ellipse at center, rgba(255, 230, 169, 0.42), rgba(233, 183, 85, 0.12) 30%, transparent 72%);
+      }
+
+      body.is-bursting::before {
+        animation: screen-flash 850ms ease-out both;
+      }
+
+      body::after {
+        position: fixed;
+        z-index: -1;
+        inset: 0;
+        content: "";
+        pointer-events: none;
+        opacity: 0.16;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+      }
+
+      .stars {
+        position: fixed;
+        z-index: -1;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .scene {
+        position: relative;
+        display: grid;
+        justify-items: center;
+        width: min(100% - 40px, 760px);
+        padding: 48px 0 72px;
+        text-align: center;
+        transform: translate3d(var(--shift-x), var(--shift-y), 0);
+        transition: transform 800ms cubic-bezier(0.2, 0.75, 0.25, 1);
+        animation: arrive 1400ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+
+      .scene::before,
+      .scene::after {
+        position: absolute;
+        left: 50%;
+        width: 1px;
+        height: 46px;
+        content: "";
+        background: linear-gradient(transparent, rgba(215, 183, 107, 0.5), transparent);
+        transform: translateX(-50%);
+      }
+
+      .scene::before {
+        top: -10px;
+      }
+
+      .scene::after {
+        bottom: 4px;
+      }
+
+      .title {
+        display: grid;
+        margin: 0;
+        font-family: "Caveat", "Segoe Script", cursive;
+        font-size: clamp(5.3rem, 15vw, 11rem);
+        font-weight: 500;
+        line-height: 0.68;
+        letter-spacing: 0;
+        transform: rotate(-4deg);
+        transition: opacity 500ms ease, filter 500ms ease;
+      }
+
+      .scene.has-burst .title {
+        opacity: 0;
+        filter: blur(8px);
+      }
+
+      .burst-message {
+        position: absolute;
+        top: 42%;
+        left: 50%;
+        width: 100%;
+        margin: 0;
+        color: var(--gold-light);
+        font-family: "Caveat", "Segoe Script", cursive;
+        font-size: clamp(2.4rem, 8vw, 4.5rem);
+        text-shadow: 0 0 22px rgba(243, 223, 161, 0.55);
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, 12px);
+        transition: opacity 700ms ease, transform 700ms ease;
+      }
+
+      .scene.has-burst .burst-message {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      .title span {
+        display: block;
+        padding: 0 0.12em 0.12em;
+        background: linear-gradient(155deg, #fff1bd 5%, #c99f4e 44%, #f6e5ad 67%, #ad8038 100%);
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 18px rgba(205, 166, 82, 0.16));
+      }
+
+      .title span:first-child {
+        margin-left: -0.72em;
+        font-size: 0.67em;
+        line-height: 1.12;
+      }
+
+      .title span:last-child {
+        position: relative;
+        z-index: 1;
+      }
+
+      .signature-line {
+        width: min(190px, 40vw);
+        height: 1px;
+        margin-top: 37px;
+        background: linear-gradient(90deg, transparent, rgba(215, 183, 107, 0.75), transparent);
+        transform: rotate(-2deg);
+      }
+
+      .start-button {
+        position: relative;
+        margin-top: 30px;
+        padding: 11px 25px 10px;
+        border: 1px solid rgba(215, 183, 107, 0.58);
+        border-radius: 2px;
+        background: rgba(15, 13, 8, 0.62);
+        color: var(--gold-light);
+        font: 500 0.78rem "Cormorant Garamond", Georgia, serif;
+        letter-spacing: 0.32em;
+        text-indent: 0.32em;
+        cursor: pointer;
+        transition: color 250ms ease, background 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+      }
+
+      .start-button:hover:not(:disabled),
+      .start-button:focus-visible {
+        border-color: var(--gold-light);
+        background: rgba(215, 183, 107, 0.12);
+        box-shadow: 0 0 24px rgba(215, 183, 107, 0.2);
+        outline: none;
+      }
+
+      .start-button:disabled {
+        color: rgba(243, 223, 161, 0.55);
+        cursor: wait;
+      }
+
+      .scene.is-bursting .title span {
+        animation: title-flash 900ms ease-out both;
+      }
+
+      @keyframes arrive {
+        from {
+          opacity: 0;
+          translate: 0 12px;
+        }
+        to {
+          opacity: 1;
+          translate: 0 0;
+        }
+      }
+
+      @keyframes screen-flash {
+        0% {
+          opacity: 0;
+        }
+        18% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes title-flash {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 18px rgba(205, 166, 82, 0.16));
+        }
+        35% {
+          filter: brightness(1.65) drop-shadow(0 0 30px rgba(255, 221, 143, 0.9));
+        }
+      }
+
+      @media (max-width: 480px) {
+        .scene {
+          width: calc(100% - 32px);
+          padding-bottom: 60px;
+        }
+
+        .title {
+          font-size: clamp(5rem, 22vw, 7rem);
+        }
+
+        .signature-line {
+          margin-top: 28px;
+        }
+
+        .start-button {
+          margin-top: 24px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+
+        .burst-message,
+        .title {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas class="stars" aria-hidden="true"></canvas>
+    <main class="scene">
+      <h1 class="title"><span>strona</span><span>dominika</span></h1>
+      <p class="burst-message" aria-live="polite">jeszce robię tą strone :D</p>
+      <div class="signature-line" aria-hidden="true"></div>
+      <button class="start-button" type="button">START</button>
+    </main>
+
+    <script>
+      const canvas = document.querySelector(".stars");
+      const context = canvas.getContext("2d");
+      const startButton = document.querySelector(".start-button");
+      const scene = document.querySelector(".scene");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const pointerFine = window.matchMedia("(pointer: fine)");
+      const stars = [];
+      const sparks = [];
+      let width = 0;
+      let height = 0;
+      let pixelRatio = 1;
+      let pointerX = 0;
+      let pointerY = 0;
+      let smoothX = 0;
+      let smoothY = 0;
+      let frame = 0;
+      let burstStart = null;
+      const burstDuration = 1500;
+
+      function createStars() {
+        stars.length = 0;
+        const count = Math.min(180, Math.round((width * height) / 8500));
+        for (let index = 0; index < count; index += 1) {
+          stars.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 1.15 + 0.2,
+            alpha: Math.random() * 0.55 + 0.2,
+            phase: Math.random() * Math.PI * 2,
+            speed: Math.random() * 0.6 + 0.25,
+            depth: Math.random() * 0.8 + 0.2
+          });
+        }
+      }
+
+      function resizeCanvas() {
+        const bounds = canvas.getBoundingClientRect();
+        width = bounds.width;
+        height = bounds.height;
+        pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(width * pixelRatio);
+        canvas.height = Math.round(height * pixelRatio);
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        createStars();
+      }
+
+      function drawStars(time) {
+        context.clearRect(0, 0, width, height);
+        const motion = reducedMotion.matches ? 0 : 1;
+        const offsetX = smoothX * 9 * motion;
+        const offsetY = smoothY * 9 * motion;
+
+        if (burstStart !== null) {
+          const elapsed = time - burstStart;
+          const progress = Math.min(elapsed / burstDuration, 1);
+          const easedProgress = 1 - (1 - progress) ** 2.4;
+          const originX = width / 2;
+          const originY = height / 2;
+
+          for (const star of stars) {
+            const angle = Math.atan2(star.y - originY, star.x - originX);
+            const distance = 220 + star.depth * 540;
+            const x = star.x + Math.cos(angle) * distance * easedProgress;
+            const y = star.y + Math.sin(angle) * distance * easedProgress;
+            const trail = (12 + star.radius * 12) * (0.25 + easedProgress);
+            context.beginPath();
+            context.moveTo(x - Math.cos(angle) * trail, y - Math.sin(angle) * trail);
+            context.lineTo(x, y);
+            context.strokeStyle = `rgba(255, 224, 153, ${star.alpha * (1 - progress)})`;
+            context.lineWidth = star.radius * 1.8;
+            context.shadowColor = "rgba(255, 207, 105, 0.9)";
+            context.shadowBlur = 7 + star.radius * 5;
+            context.stroke();
+          }
+
+          context.shadowBlur = 0;
+          for (const spark of sparks) {
+            const sparkProgress = Math.min(elapsed / spark.life, 1);
+            const distance = elapsed / 1000;
+            const x = originX + Math.cos(spark.angle) * spark.speed * distance;
+            const y = originY + Math.sin(spark.angle) * spark.speed * distance + 36 * distance * distance;
+            const tail = spark.length * (1 - sparkProgress * 0.6);
+            const alpha = 1 - sparkProgress;
+            context.beginPath();
+            context.moveTo(x - Math.cos(spark.angle) * tail, y - Math.sin(spark.angle) * tail);
+            context.lineTo(x, y);
+            context.strokeStyle = `rgba(255, ${Math.round(211 + sparkProgress * 35)}, ${Math.round(133 + sparkProgress * 90)}, ${alpha})`;
+            context.lineWidth = spark.radius;
+            context.shadowColor = "rgba(255, 206, 112, 0.95)";
+            context.shadowBlur = spark.glow;
+            context.stroke();
+            context.beginPath();
+            context.fillStyle = `rgba(255, 245, 211, ${alpha})`;
+            context.arc(x, y, spark.radius * 0.65, 0, Math.PI * 2);
+            context.fill();
+          }
+          context.shadowBlur = 0;
+
+          if (progress >= 1) {
+            burstStart = null;
+            sparks.length = 0;
+            createStars();
+            scene.classList.add("has-burst");
+            startButton.disabled = false;
+            startButton.textContent = "JESZCZE RAZ";
+          }
+        } else {
+          for (const star of stars) {
+            const shimmer = reducedMotion.matches
+              ? 0.82
+              : 0.68 + Math.sin(time * 0.0007 * star.speed + star.phase) * 0.24;
+            const x = (star.x + offsetX * star.depth + width) % width;
+            const y = (star.y + offsetY * star.depth + height) % height;
+            context.beginPath();
+            context.fillStyle = `rgba(242, 220, 165, ${star.alpha * shimmer})`;
+            context.arc(x, y, star.radius, 0, Math.PI * 2);
+            context.fill();
+          }
+        }
+
+        if (!reducedMotion.matches) frame = requestAnimationFrame(drawStars);
+      }
+
+      function startBurst() {
+        if (burstStart !== null) return;
+        scene.classList.remove("has-burst");
+        sparks.length = 0;
+        for (let index = 0; index < 130; index += 1) {
+          sparks.push({
+            angle: Math.random() * Math.PI * 2,
+            speed: 100 + Math.random() * 650,
+            life: 700 + Math.random() * 800,
+            length: 10 + Math.random() * 40,
+            radius: 0.6 + Math.random() * 2.2,
+            glow: 8 + Math.random() * 20
+          });
+        }
+        burstStart = performance.now();
+        startButton.disabled = true;
+        startButton.textContent = "...";
+        document.body.classList.add("is-bursting");
+        scene.classList.add("is-bursting");
+        window.setTimeout(() => document.body.classList.remove("is-bursting"), 900);
+        window.setTimeout(() => scene.classList.remove("is-bursting"), 950);
+        if (reducedMotion.matches) {
+          drawStars(burstStart + burstDuration);
+          drawStars(burstStart + burstDuration);
+        }
+      }
+
+      function movePointer(event) {
+        if (!pointerFine.matches || reducedMotion.matches) return;
+        pointerX = (event.clientX / window.innerWidth - 0.5) * 2;
+        pointerY = (event.clientY / window.innerHeight - 0.5) * 2;
+        document.documentElement.style.setProperty("--shift-x", `${pointerX * 5}px`);
+        document.documentElement.style.setProperty("--shift-y", `${pointerY * 5}px`);
+      }
+
+      function animatePointer() {
+        smoothX += (pointerX - smoothX) * 0.035;
+        smoothY += (pointerY - smoothY) * 0.035;
+        if (!reducedMotion.matches) requestAnimationFrame(animatePointer);
+      }
+
+      window.addEventListener("resize", resizeCanvas, { passive: true });
+      window.addEventListener("pointermove", movePointer, { passive: true });
+      startButton.addEventListener("click", startBurst);
+      resizeCanvas();
+      drawStars(0);
+      if (!reducedMotion.matches) animatePointer();
+      reducedMotion.addEventListener("change", () => {
+        cancelAnimationFrame(frame);
+        drawStars(0);
+      });
+    </script>
+  </body>
+</html>
