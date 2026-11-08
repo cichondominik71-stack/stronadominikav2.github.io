@@ -1,0 +1,1 @@
+# stronadominikav2.github.io
